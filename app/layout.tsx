@@ -9,8 +9,8 @@ import NextPrivyProvider from "@/components/providers/privy-provider";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://chat.vercel.ai"),
-  title: "Next.js Chatbot Template",
-  description: "Next.js chatbot template using the AI SDK.",
+  title: "Privy Solana Agent",
+  description: "An AI agent for Solana using Privy",
 };
 
 export const viewport = {
