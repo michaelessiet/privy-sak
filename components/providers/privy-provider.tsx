@@ -14,13 +14,18 @@ export default function NextPrivyProvider({
       config={{
         // Customize Privy's appearance in your app
         appearance: {
-          theme: "light",
+          theme: "dark",
           accentColor: "#676FFF",
+          walletChainType: "solana-only",
+          walletList: ["detected_solana_wallets"],
           // logo: "https://your-logo-url",
         },
+        loginMethods: ["email", "wallet"],
+        externalWallets: { walletConnect: { enabled: true } },
         // Create embedded wallets for users who don't have a wallet
         embeddedWallets: {
-          createOnLogin: "users-without-wallets",
+          solana: { createOnLogin: "users-without-wallets" },
+          showWalletUIs: true,
         },
       }}
     >

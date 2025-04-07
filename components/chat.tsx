@@ -86,6 +86,7 @@ export function Chat({
               chatId={id}
               input={input}
               setInput={setInput}
+              // @ts-expect-error
               handleSubmit={handleSubmit}
               status={status}
               stop={stop}

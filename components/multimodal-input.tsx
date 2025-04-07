@@ -23,7 +23,6 @@ import { Textarea } from "./ui/textarea";
 import { SuggestedActions } from "./suggested-actions";
 import equal from "fast-deep-equal";
 import type { UseChatHelpers } from "@ai-sdk/react";
-import { generateUUID } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 
 function PureMultimodalInput({
@@ -247,7 +246,7 @@ function PureMultimodalInput({
           ) {
             event.preventDefault();
 
-            if (status !== "ready") {
+            if (status !== "ready" && status !== "error") {
               toast.error("Please wait for the model to finish its response!");
             } else {
               submitForm();

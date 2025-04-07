@@ -1,22 +1,15 @@
 "use client";
 
-import { useCallback, useEffect, useLayoutEffect, useState } from "react";
-import {
-  appendResponseMessages,
-  createDataStreamResponse,
-  generateText,
-  type Message,
-  smoothStream,
-  streamText,
-  UIMessage,
-} from "ai";
+import { useCallback, useLayoutEffect, useMemo, useState } from "react";
+import { appendResponseMessages, generateText, type Message } from "ai";
 import { generateUUID, getTrailingMessageId } from "@/lib/utils";
 import { myProvider } from "@/lib/ai/providers";
-import { systemPrompt } from "@/lib/ai/prompts";
-import { getWeather } from "@/lib/ai/tools/get-weather";
-import { isProductionEnvironment } from "@/lib/constants";
 import { useSession } from "next-auth/react";
 import type { UseChatHelpers } from "@ai-sdk/react";
+import { useSolanaWallets } from "@privy-io/react-auth";
+import { SolanaAgentKit, createVercelAITools } from "solana-agent-kit";
+import TokenPlugin from "@solana-agent-kit/plugin-token";
+import { Connection, PublicKey } from "@solana/web3.js";
 
 interface UseChatOptions {
   id: string;
@@ -56,6 +49,51 @@ export function useChat({
   const [error, setError] = useState<string | null>(null);
   const [input, setInput] = useState<string>("");
   const [status, setStatus] = useState<Status>("ready");
+  const { wallets, ready } = useSolanaWallets();
+
+  const solanaTools = useMemo(() => {
+    if (ready && wallets.length > 0) {
+      const wallet = wallets[0];
+      const agent = new SolanaAgentKit(
+        {
+          publicKey: new PublicKey(wallet.address),
+          signTransaction: async (tx) => {
+            const signed = await wallet.signTransaction(tx);
+            return signed;
+          },
+          signMessage: async (msg) => {
+            const signed = await wallet.signMessage(msg);
+            return signed;
+          },
+          sendTransaction: async (tx) => {
+            const connection = new Connection(
+              process.env.NEXT_PUBLIC_RPC_URL as string,
+              "confirmed"
+            );
+            return await wallet.sendTransaction(tx, connection);
+          },
+          signAllTransactions: async (txs) => {
+            const signed = await wallet.signAllTransactions(txs);
+            return signed;
+          },
+          signAndSendTransaction: async (tx) => {
+            const signed = await wallet.signTransaction(tx);
+            const connection = new Connection(
+              process.env.NEXT_PUBLIC_RPC_URL as string,
+              "confirmed"
+            );
+            const sig = await wallet.sendTransaction(signed, connection);
+            return { signature: sig };
+          },
+        },
+        process.env.NEXT_PUBLIC_RPC_URL as string,
+        {}
+      ).use(TokenPlugin);
+
+      const tools = createVercelAITools(agent, agent.actions);
+      return tools;
+    }
+  }, [ready, wallets]);
 
   const append = useCallback(
     (newMessage: Message) => {
@@ -130,6 +168,11 @@ export function useChat({
 
         // Generate response
         if (session.user.id) {
+          if (!ready) {
+            setError("Privy wallet not connected");
+            return;
+          }
+
           const res = await generateText({
             model: myProvider.languageModel(selectedChatModel),
             system:
@@ -137,9 +180,7 @@ export function useChat({
             messages: newMessage ? [...messages, newMessage] : messages,
             maxSteps: 5,
             experimental_generateMessageId: generateUUID,
-            tools: {
-              getWeather,
-            },
+            tools: solanaTools,
           });
 
           try {
@@ -196,6 +237,8 @@ export function useChat({
                 },
               ]);
             }
+
+            setStatus("ready");
           } catch (e) {
             console.error("Failed to save chat");
             setStatus("error");
@@ -213,7 +256,7 @@ export function useChat({
         setIsLoading(false);
       }
     },
-    [id, messages, selectedChatModel, session]
+    [id, messages, selectedChatModel, session, solanaTools]
   );
 
   useLayoutEffect(() => {

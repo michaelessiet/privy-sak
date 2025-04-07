@@ -15,24 +15,24 @@ function PureSuggestedActions({ chatId, append }: SuggestedActionsProps) {
   const router = useRouter();
   const suggestedActions = [
     {
-      title: "What are the advantages",
-      label: "of using Next.js?",
-      action: "What are the advantages of using Next.js?",
+      title: "What is my",
+      label: "wallet balance",
+      action: "What is my wallet balance?",
     },
     {
-      title: "Write code to",
-      label: `demonstrate djikstra's algorithm`,
-      action: `Write code to demonstrate djikstra's algorithm`,
+      title: "What's the price",
+      label: "of SOL",
+      action: "What's the price of SOL?",
     },
     {
-      title: "Help me write an essay",
-      label: `about silicon valley`,
-      action: `Help me write an essay about silicon valley`,
+      title: "Swap 0.1 SOL for",
+      label: "EPjFWdd5AufqSSqeM2qKkMvzY2k8k4k8B1t1aQ7x1Z1",
+      action: "Swap 0.1 SOL for EPjFWdd5AufqSSqeM2qKkMvzY2k8k4k8B1t1aQ7x1Z1",
     },
     {
-      title: "What is the weather",
-      label: "in San Francisco?",
-      action: "What is the weather in San Francisco?",
+      title: "Is this a rug pull",
+      label: "6p6xgHyF7AeE6TZkSmFsko444wqoP15icUSqi2jfGiPN",
+      action: "Is this a rug pull 6p6xgHyF7AeE6TZkSmFsko444wqoP15icUSqi2jfGiPN",
     },
   ];
 
