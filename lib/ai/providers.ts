@@ -3,7 +3,7 @@ import {
   extractReasoningMiddleware,
   wrapLanguageModel,
 } from "ai";
-import { openai } from "@ai-sdk/openai";
+import { createOpenAI } from "@ai-sdk/openai";
 import { isTestEnvironment } from "../constants";
 import {
   artifactModel,
@@ -11,6 +11,8 @@ import {
   reasoningModel,
   titleModel,
 } from "./models.test";
+
+const openai = createOpenAI({ apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY });
 
 export const myProvider = isTestEnvironment
   ? customProvider({

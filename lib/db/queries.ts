@@ -49,7 +49,7 @@ export async function getUser(email: string): Promise<Array<User>> {
 export async function createUser(
   email: string,
   password: string,
-  walletId: string,
+  walletId: string | null
 ) {
   const salt = genSaltSync(10);
   const hash = hashSync(password, salt);
@@ -65,7 +65,7 @@ export async function createUser(
 export async function updateUser(
   id: string,
   email?: string,
-  walletId?: string,
+  walletId?: string
 ) {
   try {
     return await db
@@ -133,7 +133,7 @@ export async function getChatsByUserId({
         .where(
           whereCondition
             ? and(whereCondition, eq(chat.userId, id))
-            : eq(chat.userId, id),
+            : eq(chat.userId, id)
         )
         .orderBy(desc(chat.createdAt))
         .limit(extendedLimit);
@@ -328,8 +328,8 @@ export async function deleteDocumentsByIdAfterTimestamp({
       .where(
         and(
           eq(suggestion.documentId, id),
-          gt(suggestion.documentCreatedAt, timestamp),
-        ),
+          gt(suggestion.documentCreatedAt, timestamp)
+        )
       );
 
     return await db
@@ -337,7 +337,7 @@ export async function deleteDocumentsByIdAfterTimestamp({
       .where(and(eq(document.id, id), gt(document.createdAt, timestamp)));
   } catch (error) {
     console.error(
-      "Failed to delete documents by id after timestamp from database",
+      "Failed to delete documents by id after timestamp from database"
     );
     throw error;
   }
@@ -368,7 +368,7 @@ export async function getSuggestionsByDocumentId({
       .where(and(eq(suggestion.documentId, documentId)));
   } catch (error) {
     console.error(
-      "Failed to get suggestions by document version from database",
+      "Failed to get suggestions by document version from database"
     );
     throw error;
   }
@@ -395,7 +395,7 @@ export async function deleteMessagesByChatIdAfterTimestamp({
       .select({ id: message.id })
       .from(message)
       .where(
-        and(eq(message.chatId, chatId), gte(message.createdAt, timestamp)),
+        and(eq(message.chatId, chatId), gte(message.createdAt, timestamp))
       );
 
     const messageIds = messagesToDelete.map((message) => message.id);
@@ -404,18 +404,18 @@ export async function deleteMessagesByChatIdAfterTimestamp({
       await db
         .delete(vote)
         .where(
-          and(eq(vote.chatId, chatId), inArray(vote.messageId, messageIds)),
+          and(eq(vote.chatId, chatId), inArray(vote.messageId, messageIds))
         );
 
       return await db
         .delete(message)
         .where(
-          and(eq(message.chatId, chatId), inArray(message.id, messageIds)),
+          and(eq(message.chatId, chatId), inArray(message.id, messageIds))
         );
     }
   } catch (error) {
     console.error(
-      "Failed to delete messages by id after timestamp from database",
+      "Failed to delete messages by id after timestamp from database"
     );
     throw error;
   }
