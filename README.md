@@ -49,3 +49,7 @@ To run the agent, use the following command:
 ```bash
 pnpm dev
 ```
+
+### Note
+
+This is an example agent and is not intended for production use. It is recommended to review the code and make any necessary modifications before deploying it in a production environment. It is especially recommended to review the security aspects of the agent, such as authentication, secrets, and authorization, to ensure that it meets your security requirements.
